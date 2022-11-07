@@ -18,6 +18,12 @@
   box-shadow: 24;
   padding: 10px;
   display: grid;
+  overflow-y: auto;
+}
+
+.fieldsList {
+  box-sizing: border-box;
+  height: 100%;
 }
 
 ul.fieldsList li {
