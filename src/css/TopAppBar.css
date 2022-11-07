@@ -1,0 +1,61 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+}
+
+.muiAppBar {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.searchComponents {
+  display: flex;
+  align-items: center;
+  width: 400px;
+  height: 50px;
+  padding: 0px;
+  justify-content: space-around;
+}
+
+.searchIconBtn {
+  width: 20px;
+  height: 18px;
+  display: flex;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid;
+  border-color: #b2beb5;
+  background-color: white;
+}
+
+.searchIcon {
+  color: black;
+}
+
+.searchInput {
+  background: white !important;
+  border-radius: 8px;
+}
+
+label.Mui-focused {
+  color: white !important;
+  background: #004443 !important;
+  padding-inline: 0.5rem;
+  margin-left: -0.25rem;
+  border-radius: 0.25rem;
+  transform: translate(14px, -12px) scale(0.75);
+}
+
+.longMenu {
+  color: white;
+  background-color: white;
+}/*# sourceMappingURL=TopAppBar.css.map */

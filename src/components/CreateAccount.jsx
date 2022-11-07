@@ -5,24 +5,24 @@ import { Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
 } from "firebase/auth";
-import { auth } from "../firebaseConfig";
-import { useState } from "react";
+import { auth } from "../App";
+import { useState, useEffect } from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { theme } from "./TopAppBar.jsx";
 
 export function CreateAccount() {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [user, setUser] = useState({});
 
-  onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
-  const logout = async () => {
-    await signOut(auth);
-  };
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
 
-  const register = async () => {
+  async function register() {
     try {
       const user = await createUserWithEmailAndPassword(
         auth,
@@ -33,61 +33,57 @@ export function CreateAccount() {
     } catch (error) {
       console.log(error.message);
     }
-  };
+  }
 
   return (
     <div className="loginContainer">
       <div className="loginFormContainer">
-        <FormControl className="form">
-          <TextField
-            onChange={(email) => {
-              setRegisterEmail(email.target.value);
-            }}
-            className="emailInput"
-            id="outlined-basic"
-            label="Email"
-            variant="outlined"
-            name="email"
-            type="text"
-          />
-          <TextField
-            onChange={(password) => {
-              setRegisterPassword(password.target.value);
-            }}
-            className="passwordInput"
-            id="outlined-basic"
-            label="Senha"
-            variant="outlined"
-            name="password"
-            type="password"
-          />
-          <Button
-            onClick={(e) => {
-              register(e);
-            }}
-            type="submit"
-            variant="contained"
-          >
-            Criar Conta
-          </Button>
-          <Button
-            onClick={(e) => {
-              logout(e);
-            }}
-            type="submit"
-            variant="contained"
-          >
-            Logout
-          </Button>
+        <ThemeProvider theme={theme}>
+          <FormControl className="form">
+            <TextField
+              onChange={(email) => {
+                setRegisterEmail(email.target.value);
+              }}
+              value={registerEmail}
+              className="emailInput"
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
+              name="email"
+              type="text"
+            />
+            <TextField
+              onChange={(password) => {
+                setRegisterPassword(password.target.value);
+              }}
+              value={registerPassword}
+              className="passwordInput"
+              id="outlined-basic"
+              label="Senha"
+              variant="outlined"
+              name="password"
+              type="password"
+            />
+            <Button
+              color="primary"
+              className="createAccBtn"
+              onClick={(e) => {
+                register(e);
+              }}
+              type="submit"
+              variant="contained"
+            >
+              Criar Conta
+            </Button>
 
-          <Link className="link" to={"/"}>
-            Já possui uma conta? Faça login
-          </Link>
-          <Link className="link" to={"/new-password"}>
-            Esqueci minha senha!
-          </Link>
-          <h1>{user?.email}</h1>
-        </FormControl>
+            <Link className="link" to={"/login"}>
+              Já possui uma conta? Faça login
+            </Link>
+            <Link className="link" to={"/new-password"}>
+              Esqueci minha senha!
+            </Link>
+          </FormControl>
+        </ThemeProvider>
       </div>
     </div>
   );

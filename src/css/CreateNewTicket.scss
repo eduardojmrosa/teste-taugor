@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+}
+.createTicketModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 600px;
+  height: 90vh;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 24;
+  padding: 10px;
+  display: grid;
+}
+ul.fieldsList li {
+  padding: 8px;
+  list-style: none;
+}
+.titleInput {
+  width: 100%;
+  margin-top: 50px;
+}
+.combobox {
+  width: 100%;
+}

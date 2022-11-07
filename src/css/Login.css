@@ -30,7 +30,7 @@
   display: grid;
   padding: 75px;
   gap: 10px;
-  justify-items: center;
+  place-items: center;
 }
 
 .emailInput {
@@ -47,4 +47,8 @@
 .link {
   text-decoration: none;
   color: #1565c0;
+}
+
+.loginBtn {
+  color: #004443;
 }/*# sourceMappingURL=Login.css.map */
