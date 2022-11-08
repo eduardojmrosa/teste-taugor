@@ -3,10 +3,29 @@ import { BsSearch } from "react-icons/bs";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import LongMenu from "./LongMenu";
+
 export const theme = createTheme({
   palette: {
     primary: {
       main: "#004443",
+    },
+  },
+});
+Object.assign(theme, {
+  overrides: {
+    MUIRichTextEditor: {
+      root: {},
+      editor: {
+        height: "100px",
+        maxHeight: "100px",
+
+        width: "100%",
+        border: "1px solid",
+        borderColor: "#707070",
+      },
+      label: {
+        marginLeft: "10px",
+      },
     },
   },
 });

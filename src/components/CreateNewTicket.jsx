@@ -4,13 +4,12 @@ import { theme } from "./TopAppBar.jsx";
 import MUIRichTextEditor from "mui-rte";
 import * as React from "react";
 import { useState } from "react";
-import PropTypes from "prop-types";
-import { useAutocomplete } from "@mui/base/AutocompleteUnstyled";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import { styled } from "@mui/material/styles";
-import { autocompleteClasses } from "@mui/material/Autocomplete";
 import Autocomplete from "@mui/material/Autocomplete";
+import { Button } from "@mui/material";
+import { db } from "../App.js";
+import { useEffect } from "react";
+import { getDocs } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 
 const descriptDataSave = (data) => {
   console.log(data);
@@ -23,10 +22,24 @@ export function CreateNewTicket() {
   const [title, setTitle] = useState("");
   const [operationState, setOperationState] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
-  console.log(title);
+  const [categories, setCategories] = useState([]);
+  const categoriesRef = collection(db, "categories");
+  useEffect(() => {
+    const getCategories = async () => {
+      const data = await getDocs(categoriesRef);
+
+      const categories = data.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCategories(categories);
+    };
+    getCategories();
+  }, []);
+  console.log(typeof categories);
   return (
     <div>
-      <form className="fields">
+      <div className="fields">
         <ThemeProvider theme={theme}>
           <ul className="fieldsList">
             <li>
@@ -161,8 +174,11 @@ export function CreateNewTicket() {
               ></MUIRichTextEditor>
             </li>
           </ul>
+          <Button className="saveBtn" variant="contained">
+            Salvar
+          </Button>
         </ThemeProvider>
-      </form>
+      </div>
     </div>
   );
 }

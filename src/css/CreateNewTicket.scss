@@ -1,9 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap");
 * {
   margin: 0;
   padding: 0;
   border: 0;
   font-size: 100%;
 }
+
 .createTicketModal {
   position: absolute;
   top: 50%;
@@ -31,6 +33,13 @@ ul.fieldsList li {
   width: 100%;
   margin-top: 50px;
 }
-.combobox {
-  width: 100%;
+.fields {
+  display: grid;
+  place-items: end;
+}
+.saveBtn {
+  margin-top: 20px;
+}
+.h1 {
+  font-family: "Inter", sans-serif;
 }

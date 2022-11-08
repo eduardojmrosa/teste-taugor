@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap");
 * {
   margin: 0;
   padding: 0;
@@ -36,6 +37,15 @@ ul.fieldsList li {
   margin-top: 50px;
 }
 
-.combobox {
-  width: 100%;
+.fields {
+  display: grid;
+  place-items: end;
+}
+
+.saveBtn {
+  margin-top: 20px;
+}
+
+.h1 {
+  font-family: "Inter", sans-serif;
 }/*# sourceMappingURL=CreateNewTicket.css.map */

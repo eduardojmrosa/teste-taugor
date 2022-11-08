@@ -9,6 +9,7 @@ import { Home } from "./view/Home";
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { useEffect } from "react";
 
 export const firebaseApp = initializeApp({
   apiKey: "AIzaSyCexjTKI1v_4ASkmGBNrQ3hdlXPJmc8KTs",
