@@ -36,7 +36,10 @@ export function CreateNewTicket() {
     };
     getCategories();
   }, []);
-  console.log(typeof categories);
+  const arrayResult = categories.map((category) => {
+    return { id: category.id, title: category.title };
+  });
+  console.log(arrayResult);
   return (
     <div>
       <div className="fields">
@@ -97,7 +100,7 @@ export function CreateNewTicket() {
                   setProduct(product);
                 }}
                 id="combo-box-demo"
-                options={top100Films}
+                options={arrayResult}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
                   <TextField {...params} label="Categoria" />

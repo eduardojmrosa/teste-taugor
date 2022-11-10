@@ -1,8 +1,5 @@
-import { useState } from "react";
 import Modal from "../components/BasicModal";
-import { CreateNewTicket } from "../components/CreateNewTicket";
 import { TopAppBar } from "../components/TopAppBar";
-import { DataGrid } from "@mui/x-data-grid";
 import { DataGridDemo } from "../components/DataGridDemo";
 
 export function Home() {

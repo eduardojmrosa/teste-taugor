@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import { useEffect, useState } from "react";
 import { auth } from "../App";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
@@ -14,12 +14,11 @@ import { theme } from "./TopAppBar.jsx";
 
 export async function logout() {
   await signOut(auth);
-  console.log("deslogou");
 }
 export function Login() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const [user, setUser] = useState({});
+  const navigate = useNavigate();
   const login = async () => {
     try {
       const user = await signInWithEmailAndPassword(
@@ -27,16 +26,12 @@ export function Login() {
         loginEmail,
         loginPassword
       );
+      navigate("/");
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-  }, []);
   return (
     <div className="loginContainer">
       <div className="loginFormContainer">

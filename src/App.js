@@ -9,7 +9,8 @@ import { Home } from "./view/Home";
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { useEffect } from "react";
+import { AuthProvider } from "./Auth";
+import { PrivateRoute } from "./routes/PrivateRoute";
 
 export const firebaseApp = initializeApp({
   apiKey: "AIzaSyCexjTKI1v_4ASkmGBNrQ3hdlXPJmc8KTs",
@@ -26,17 +27,26 @@ export const db = getFirestore(firebaseApp);
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/"></Route>
-        <Route path="/home" element={<Home></Home>}></Route>
-        <Route path="/login" element={<Login></Login>}></Route>
-        <Route
-          path="/account-create"
-          element={<CreateAccount></CreateAccount>}
-        ></Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              //descomentar pra voltar a proteção a home page
+              //<PrivateRoute>
+              <Home></Home>
+              // </PrivateRoute>
+            }
+          ></Route>
+          <Route path="/login" element={<Login></Login>}></Route>
+          <Route
+            path="/account-create"
+            element={<CreateAccount></CreateAccount>}
+          ></Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
