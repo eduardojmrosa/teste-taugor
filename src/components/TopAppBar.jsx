@@ -11,24 +11,7 @@ export const theme = createTheme({
     },
   },
 });
-Object.assign(theme, {
-  overrides: {
-    MUIRichTextEditor: {
-      root: {},
-      editor: {
-        height: "100px",
-        maxHeight: "100px",
 
-        width: "100%",
-        border: "1px solid",
-        borderColor: "#707070",
-      },
-      label: {
-        marginLeft: "10px",
-      },
-    },
-  },
-});
 export function TopAppBar() {
   return (
     <div className="appBar">

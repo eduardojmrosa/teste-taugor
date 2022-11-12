@@ -8,9 +8,27 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { Button } from "@mui/material";
 import { db } from "../App.js";
 import { useEffect } from "react";
-import { getDocs } from "firebase/firestore";
+import { addDoc, getDocs } from "firebase/firestore";
 import { collection } from "firebase/firestore";
+import { convertToRaw } from "draft-js";
+Object.assign(theme, {
+  overrides: {
+    MUIRichTextEditor: {
+      root: {},
+      editor: {
+        height: "100px",
+        maxHeight: "100px",
 
+        width: "100%",
+        border: "1px solid",
+        borderColor: "#707070",
+      },
+      label: {
+        marginLeft: "10px",
+      },
+    },
+  },
+});
 const descriptDataSave = (data) => {
   console.log(data);
 };
@@ -23,23 +41,44 @@ export function CreateNewTicket() {
   const [operationState, setOperationState] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
   const [categories, setCategories] = useState([]);
+  const [defineCategories, setDefineCategories] = useState([]);
+  const [rteValue, setrteValue] = useState("");
+  const onEditorChange = (event) => {
+    //const plainText = event.getCurrentContent().getPlainText(); // for plain text
+    const rteContent = convertToRaw(event.getCurrentContent()); // for rte content with text formating
+    rteContent && setrteValue(JSON.stringify(rteContent)); // store your rteContent to state
+  };
+  //Get the collection references from firebase
   const categoriesRef = collection(db, "categories");
-  useEffect(() => {
-    const getCategories = async () => {
-      const data = await getDocs(categoriesRef);
+  const ticketsRef = collection(db, "tickets");
 
-      const categories = data.docs.map((doc) => ({
+  useEffect(() => {
+    async function getCategories() {
+      const res = await getDocs(categoriesRef);
+
+      const data = res.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setCategories(categories);
-    };
+
+      setCategories(data);
+    }
     getCategories();
   }, []);
-  const arrayResult = categories.map((category) => {
-    return { id: category.id, title: category.title };
-  });
-  console.log(arrayResult);
+  //Create ticket function / need fields validation
+  async function createTicket() {
+    const ticket = await addDoc(ticketsRef, {
+      title,
+      problemDescription,
+      product,
+      defineCategories,
+      environmentInfo,
+      priorityLevel,
+      affectedUsersTotal,
+      operationState,
+      rteValue,
+    });
+  }
   return (
     <div>
       <div className="fields">
@@ -85,7 +124,7 @@ export function CreateNewTicket() {
                   setProduct(product);
                 }}
                 id="combo-box-demo"
-                options={top100Films}
+                options={products}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
                   <TextField {...params} label="Produto" />
@@ -95,12 +134,13 @@ export function CreateNewTicket() {
             <li>
               <Autocomplete
                 disablePortal
-                value={product}
-                onChange={(event, product) => {
-                  setProduct(product);
+                value={defineCategories}
+                onChange={(event, value) => {
+                  setDefineCategories(value);
+                  console.log(...defineCategories);
                 }}
                 id="combo-box-demo"
-                options={arrayResult}
+                options={categories.map((category) => category.title)}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
                   <TextField {...params} label="Categoria" />
@@ -174,10 +214,17 @@ export function CreateNewTicket() {
                 label="Descrição"
                 onSave={descriptDataSave}
                 inlineToolbar={true}
+                onChange={onEditorChange}
               ></MUIRichTextEditor>
             </li>
           </ul>
-          <Button className="saveBtn" variant="contained">
+          <Button
+            className="saveBtn"
+            variant="contained"
+            onClick={(e) => {
+              createTicket();
+            }}
+          >
             Salvar
           </Button>
         </ThemeProvider>
@@ -187,6 +234,7 @@ export function CreateNewTicket() {
 }
 
 const priority = ["Alta", "Média", "Baixa"];
+const products = ["Carro", "Casa", "Cavalo"];
 const environment = [
   "Dados/Ambiente de testes - Somente testes",
   "Ambiente de produção - Cliete Ativo/Licença",
