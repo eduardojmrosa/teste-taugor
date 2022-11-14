@@ -3,14 +3,28 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./TopAppBar.jsx";
 import MUIRichTextEditor from "mui-rte";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Button } from "@mui/material";
-import { db } from "../App.js";
+import { db, storage } from "../App.js";
 import { useEffect } from "react";
-import { addDoc, getDocs } from "firebase/firestore";
-import { collection } from "firebase/firestore";
+import {
+  addDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  orderBy,
+  onSnapshot,
+  query,
+  limit,
+  collection,
+} from "firebase/firestore";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
 import { convertToRaw } from "draft-js";
+import { Input } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
+
+//Rte style object
 Object.assign(theme, {
   overrides: {
     MUIRichTextEditor: {
@@ -32,7 +46,7 @@ Object.assign(theme, {
 const descriptDataSave = (data) => {
   console.log(data);
 };
-export function CreateNewTicket() {
+export function CreateNewTicket({ handleModalClose }) {
   const [product, setProduct] = useState("");
   const [environmentInfo, setEnvironmentInfo] = useState("");
   const [affectedUsersTotal, setAffectedUsersTotal] = useState("");
@@ -43,6 +57,50 @@ export function CreateNewTicket() {
   const [categories, setCategories] = useState([]);
   const [defineCategories, setDefineCategories] = useState([]);
   const [rteValue, setrteValue] = useState("");
+  const [files, setFiles] = useState([]);
+
+  const [atualId, setAtualId] = useState("");
+
+  //File upload
+  async function fileUpload() {
+    if (files === null) return;
+
+    const filesUploaded = [];
+
+    await Promise.all(
+      files.map(async (file) => {
+        const fileRef = ref(
+          storage,
+          `ticket-files/${file.uuid}"@"${file.name}`
+        );
+
+        await uploadBytes(fileRef, file);
+        const fileUrl = await getDownloadURL(fileRef);
+        filesUploaded.push({
+          name: file.name,
+          id: file.uuid,
+          url: fileUrl,
+        });
+      })
+    );
+
+    const docsRef = doc(db, "tickets", atualId);
+    await updateDoc(docsRef, {
+      files: filesUploaded,
+    });
+
+    console.log("new url add to document");
+    alert("Ticket created successfully and file upload sucefully");
+
+    setAtualId("");
+    setFiles([]);
+    handleModalClose();
+  }
+  useEffect(() => {
+    console.log(files);
+    console.log(atualId);
+  }, [files, atualId]);
+  //Getting the rte text
   const onEditorChange = (event) => {
     //const plainText = event.getCurrentContent().getPlainText(); // for plain text
     const rteContent = convertToRaw(event.getCurrentContent()); // for rte content with text formating
@@ -52,6 +110,7 @@ export function CreateNewTicket() {
   const categoriesRef = collection(db, "categories");
   const ticketsRef = collection(db, "tickets");
 
+  //Get the categories from firebase
   useEffect(() => {
     async function getCategories() {
       const res = await getDocs(categoriesRef);
@@ -65,9 +124,26 @@ export function CreateNewTicket() {
     }
     getCategories();
   }, []);
+  //Getting the last created document
+  useEffect(() => {
+    const q = query(
+      collection(db, "tickets"),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
+    onSnapshot(q, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        console.log(JSON.stringify(doc.id));
+      });
+    });
+  }, []);
+
   //Create ticket function / need fields validation
   async function createTicket() {
+    const createdAt = new Date();
+
     const ticket = await addDoc(ticketsRef, {
+      createdAt,
       title,
       problemDescription,
       product,
@@ -78,7 +154,21 @@ export function CreateNewTicket() {
       operationState,
       rteValue,
     });
+
+    const firestoreDocument = doc(db, "tickets", ticket.id);
+    await updateDoc(firestoreDocument, {
+      id: ticket.id,
+    });
+
+    if (ticket.id) {
+      setAtualId(ticket.id);
+    }
   }
+
+  useEffect(() => {
+    if (!!atualId.length) fileUpload();
+  }, [atualId]);
+
   return (
     <div>
       <div className="fields">
@@ -126,6 +216,10 @@ export function CreateNewTicket() {
                 id="combo-box-demo"
                 options={products}
                 sx={{ width: "100%" }}
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
                 renderInput={(params) => (
                   <TextField {...params} label="Produto" />
                 )}
@@ -134,6 +228,7 @@ export function CreateNewTicket() {
             <li>
               <Autocomplete
                 disablePortal
+                aria-required={true}
                 value={defineCategories}
                 onChange={(event, value) => {
                   setDefineCategories(value);
@@ -142,6 +237,10 @@ export function CreateNewTicket() {
                 id="combo-box-demo"
                 options={categories.map((category) => category.title)}
                 sx={{ width: "100%" }}
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
                 renderInput={(params) => (
                   <TextField {...params} label="Categoria" />
                 )}
@@ -156,6 +255,10 @@ export function CreateNewTicket() {
                 }}
                 id="combo-box-demo"
                 options={environment}
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
                   <TextField {...params} label="Informações de ambiente" />
@@ -170,6 +273,10 @@ export function CreateNewTicket() {
                   setPriorityLevel(priorityLevel);
                 }}
                 id="combo-box-demo"
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
                 options={priority}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
@@ -185,7 +292,13 @@ export function CreateNewTicket() {
                   setAffectedUsersTotal(affectedUsersTotal);
                 }}
                 id="combo-box-demo"
-                options={affectedUsers}
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
+                options={affectedUsers.map(
+                  (affectedUser) => affectedUser.title
+                )}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
                   <TextField {...params} label="Usuários impactados" />
@@ -200,6 +313,10 @@ export function CreateNewTicket() {
                   setOperationState(operationState);
                 }}
                 id="combo-box-demo"
+                getOptionSelected={(option, value) =>
+                  option.value === value.value
+                }
+                filterSelectedOptions={true}
                 options={operation}
                 sx={{ width: "100%" }}
                 renderInput={(params) => (
@@ -207,7 +324,19 @@ export function CreateNewTicket() {
                 )}
               />
             </li>
-
+            <li>
+              <Input
+                type="file"
+                onChange={(e) => {
+                  for (let i = 0; i < e.target.files.length; i++) {
+                    const newFiles = e.target.files[i];
+                    newFiles["uuid"] = uuidv4();
+                    setFiles((prevState) => [...prevState, newFiles]);
+                  }
+                }}
+                inputProps={{ multiple: true }}
+              ></Input>
+            </li>
             <li>
               <MUIRichTextEditor
                 className="muiRTE"
@@ -227,6 +356,7 @@ export function CreateNewTicket() {
           >
             Salvar
           </Button>
+          <Button onClick={handleModalClose}>Fechar</Button>
         </ThemeProvider>
       </div>
     </div>
@@ -241,11 +371,11 @@ const environment = [
 ];
 const operation = ["Sim", "Não"];
 const affectedUsers = [
-  "Apenas 1",
-  "1 a 10 Usuários",
-  "11 a 30 Usuários",
-  "31 a 50 Usuários",
-  "Mais de 50 Usuários",
+  { title: "Apenas 1" },
+  { title: "1 a 10 Usuários" },
+  { title: "11 a 30 Usuários" },
+  { title: "31 a 50 Usuários" },
+  { title: "Mais de 50 Usuários" },
 ];
 // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
 const top100Films = [

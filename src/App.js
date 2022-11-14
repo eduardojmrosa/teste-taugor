@@ -9,6 +9,7 @@ import { Home } from "./view/Home";
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import { AuthProvider } from "./Auth";
 import { PrivateRoute } from "./routes/PrivateRoute";
 
@@ -24,6 +25,7 @@ export const firebaseApp = initializeApp({
 
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp);
+export const storage = getStorage(firebaseApp);
 
 function App() {
   return (

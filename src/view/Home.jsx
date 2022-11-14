@@ -1,4 +1,4 @@
-import Modal from "../components/BasicModal";
+import BasicModal from "../components/BasicModal";
 import { TopAppBar } from "../components/TopAppBar";
 import { DataGridDemo } from "../components/DataGridDemo";
 
@@ -9,7 +9,7 @@ export function Home() {
 
       <div className="contentContainer">
         <div className="gridContainer">
-          <Modal className="modal"></Modal>
+          <BasicModal className="modal"></BasicModal>
           <DataGridDemo></DataGridDemo>
         </div>
       </div>

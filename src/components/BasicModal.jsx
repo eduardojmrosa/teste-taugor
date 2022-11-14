@@ -5,6 +5,19 @@ import Modal from "@mui/material/Modal";
 import { CreateNewTicket } from "./CreateNewTicket";
 import { ThemeProvider } from "@emotion/react";
 import { theme } from "./TopAppBar.jsx";
+import {
+  addDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  orderBy,
+  onSnapshot,
+  query,
+  limit,
+  collection,
+  Firestore,
+} from "firebase/firestore";
+import { db, storage } from "../App.js";
 
 const style = {
   position: "absolute",
@@ -21,23 +34,31 @@ const style = {
 
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => {
+    setOpen(true);
+    console.log("Open");
+  };
+  const handleModalClose = () => {
+    setOpen(false);
+    console.log("Close");
+  };
 
   return (
     <div>
       <ThemeProvider theme={theme}>
-        <Button className="modalBtn" onClick={handleOpen}>
+        <Button className="modalBtn" variant="contained" onClick={handleOpen}>
           Criar
         </Button>
         <Modal
           open={open}
-          onClose={handleClose}
+          onClose={handleModalClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
           <Box className="createTicketModal">
-            <CreateNewTicket></CreateNewTicket>
+            <CreateNewTicket
+              handleModalClose={handleModalClose}
+            ></CreateNewTicket>
           </Box>
         </Modal>
       </ThemeProvider>
